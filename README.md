@@ -4,7 +4,7 @@
 
 -git clone https://github.com/hwolf0610/runwell_MERN_stack.git
 
--cd client
+-cd frontend_React
 
 -npm install
 
