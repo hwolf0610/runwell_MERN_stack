@@ -13,6 +13,7 @@ const PORT = process.env.PORT || 4000;
 let User = require('./User.model');
 let Beds = require('./Beds.model');
 let Customer = require('./Customer.model');
+let Star = require('./Star.model');
 app.use(cors());
 app.use(bodyParser.json());
 app.use('/static', express.static('public'))
@@ -25,7 +26,7 @@ connection.once('open', function () {
 var date;
 var inputDate;
 const storage = multer.diskStorage({
-    destination: "./client/build/static/media/",
+    destination: "./frontend_React/build/static/media/",
     filename(req, file, cb) {
         date = new Date();
         inputDate = date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate() + "-" + date.getDay() + "-" + date.getHours()
@@ -195,6 +196,46 @@ todoRoutes.route('/addMember').post(function (req, res) {
     }
 });
 
+todoRoutes.route('/addStar').post(function (req, res) {
+    if (req.body.address1 != null && req.body.address2 != null && req.body.manageremail != null && req.body.rating != null && req.body.username != null) {
+        let star = new Star(req.body);
+        star.save()
+            .then(todo => {
+                res.status(200).json({
+                    'status': 200,
+                    'message': 'todo added successfully',
+                    'data': 'successfully'
+                });
+                console.log("request : ", req.body)
+            })
+            .catch(err => {
+                res.status(401).json({
+                    'status': 401,
+                    'message': 'todo added failed',
+                    'data': 'flase'
+                });
+            });
+    } else {
+        res.status(400).json({
+            'status': 400,
+            'message': 'please input all field or correct value',
+            'data': 'flase'
+        });
+    }
+});
+
+todoRoutes.route('/Starshow').post(function (req, res) {
+    Star.find(function (err, star) {
+        console.log(star.manageremail);
+        if (err) {
+            console.log("err->", err);
+        } else {
+            res.json(star);
+
+        }
+    });
+});
+
 todoRoutes.route('/Usershow').post(function (req, res) {
     User.find(function (err, user) {
         console.log(user.name);
@@ -277,11 +318,11 @@ app.use('/todos', todoRoutes);
 
 if (process.env.NODE_ENV === 'production') {
     // Serve any static files
-    app.use(express.static(path.join(__dirname, 'client/build')));
+    app.use(express.static(path.join(__dirname, 'frontend_React/build')));
 
     // Handle React routing, return all requests to React app
     app.get('*', function (req, res) {
-        res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
+        res.sendFile(path.join(__dirname, 'frontend_React/build', 'index.html'));
     });
 }
 
